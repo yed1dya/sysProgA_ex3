@@ -7,7 +7,7 @@ typedef struct _node{
     char*_data;
     struct _node*_next;
 } Node;
-Node*Node_alloc(char*data, Node*next){
+Node*Node_alloc(const char*data, Node*next){
     Node*newNode = (Node*)malloc(sizeof(Node));
     if(newNode==NULL){
         printf("Node malloc failed at line 13: Node*Node_alloc(char*data,Node*next)");
@@ -26,7 +26,7 @@ typedef struct _StrList{
     Node*_head;
     size_t _size;
 } StrList;
-StrList*StrList_alloc(){
+StrList* StrList_alloc(){
     StrList*newList = (StrList*)malloc(sizeof(StrList));
     if(newList==NULL){
         printf("Strlist malloc failed at line 32: StrList*StrList_alloc()");
@@ -144,7 +144,7 @@ int StrList_printLen(const StrList*StrList){
 
 int StrList_count(StrList*StrList, const char*data){
     if(StrList==NULL) return 0;
-    if(StrList->_head==NULL) return;
+    if(StrList->_head==NULL) return 0;
     int count = 0;
     Node*current = StrList->_head;
     while(current){
@@ -217,16 +217,15 @@ int StrList_isEqual(const StrList*StrList1, const StrList*StrList2){
     return 0;
 }
 
-StrList* StrList_clone(const StrList*StrList){
-    if(StrList==NULL) return NULL;
-    struct StrList*newList = StrList_alloc();
-    if(newList==NULL) return NULL;
-    Node*current = StrList->_head;
+StrList*StrList_clone(const StrList *Strlist){
+    if (Strlist == NULL) return NULL;
+    StrList*list = StrList_alloc();
+    Node*current = Strlist->_head;
     while(current){
-        StrList_insertLast(newList,current->_data);
+        StrList_insertLast(list,current->_data);
         current = current->_next;
     }
-    return newList;
+    return list;
 }
 
 void StrList_reverse(StrList*StrList){
