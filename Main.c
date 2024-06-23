@@ -10,17 +10,17 @@ void clearInput(){
 
 char* getString(){
     char*s = (char*)malloc(sizeof(char));
-    *s = "\0";
+    s = 0;
     char c = getchar();
     int length = 0; 
-    while(c!=" " && c!="\n" && c!= EOF){
+    while(c!=' ' && c!='\n' && c!= EOF){
         s = (char*)realloc(s,length+2);
         if(s==NULL){
             free(s);
             exit(EXIT_FAILURE);
         }
         *(s+length) = c;
-        *(s+length) = "\0";
+        *(s+length) = 0;
         c = getchar();
     }
     return s;
