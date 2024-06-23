@@ -1,14 +1,14 @@
 CC = gcc
 FLAGS = -Wall -g
 
-StrList: Main.o
-	$(CC) -o StrList Main.o
+StrList: Main.o StrList.o
+	$(CC) $(FLAGS) -o StrList StrList.o Main.o
 
-StrList.o: StrList.h
-	$(CC) -c $(FLAGS) -fPIC StrList.c
+StrList.o: StrList.c StrList.h
+	$(CC) $(FLAGS) -c StrList.c -o StrList.o
 
 Main.o: Main.c StrList.h
-	$(CC) -c $(FLAGS) -fPIC Main.c
+	$(CC) $(FLAGS) -c Main.c -o Main.o
 
 .PHONY: all clean
 
