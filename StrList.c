@@ -10,10 +10,16 @@ typedef struct _node{
 Node*Node_alloc(const char*data, Node*next){
     Node*newNode = (Node*)malloc(sizeof(Node));
     if(newNode==NULL){
-        printf("Node malloc failed at line 13: Node*Node_alloc(char*data,Node*next)");
+        printf("Node malloc fail at line 13\n");
         return NULL;
     }
     newNode->_data = strdup(data);
+    if(newNode->_data==NULL){
+        printf("Node data strdup fail at line 18\n");
+        free(newNode->_data);
+        free(newNode);
+        return NULL;
+    }
     newNode->_next = next;
     return newNode;
 }
@@ -29,7 +35,7 @@ typedef struct _StrList{
 StrList* StrList_alloc(){
     StrList*newList = (StrList*)malloc(sizeof(StrList));
     if(newList==NULL){
-        printf("Strlist malloc failed at line 32: StrList*StrList_alloc()");
+        printf("Strlist malloc fail at line 38\n");
         return NULL;
     }
     newList->_head = NULL;
@@ -49,6 +55,11 @@ void StrList_free(StrList*StrList){
 }
 
 size_t StrList_size(const StrList*StrList){
+    if(StrList==NULL){
+        //printf("list is null\n");
+        return 0;
+    }
+    //printf("size is %zu\n",StrList->_size);
     return StrList->_size;
 }
 
@@ -58,31 +69,37 @@ void StrList_insertAt(StrList*StrList, const char*data, int index){
     if(index<0 || index > size) return;
     Node*newNode = Node_alloc(data,NULL);
     if(newNode==NULL){
-        printf("node malloc failed at line 61: void StrList_insertAt(StrList*StrList, const char*data, int index)");
+        printf("node malloc fail at line 72\n");
         return;
     }
     if(StrList->_head==NULL){
+        //printf("head is null\n");
         StrList->_head = newNode;
+        (StrList->_size)++;
         return;
     }
     Node*current = StrList->_head;
     if(index==0){
+        //printf("inserting at 0\n");
         newNode->_next = current;
         StrList->_head = newNode;
+        (StrList->_size)++;
         return;
     }
     int place = 0;
     while(++place < index){
         current = current->_next;
     }
+    //printf("inserting at index %d, place %d\n",index, place);
     newNode->_next = current->_next;
     current->_next = newNode;
-    StrList->_size++;
+    (StrList->_size)++;
+    //printf("size is now %zu\n",StrList->_size);
 }
 
 void StrList_insertLast(StrList*StrList, const char*data){
     if(StrList==NULL) return;
-    StrList_insertAt(StrList,data,StrList->_size);
+    StrList_insertAt(StrList,data,StrList_size(StrList));
 }
 
 char*StrList_firstData(const StrList*StrList){
@@ -157,24 +174,18 @@ int StrList_count(StrList*StrList, const char*data){
 }
 
 void StrList_remove(StrList*StrList, const char*data){
-    if(StrList==NULL) return;
-    if(StrList->_head==NULL) return;
+    if(StrList==NULL || data==NULL) return;
+    if(StrList->_head==NULL || sizeof(data)==0) return;
     Node*current = StrList->_head;
-    Node*next = current->_next;
-    while(next){
-        if(strcmp(next->_data, data)==0){
-            current->_next = next->_next;
-            Node_free(next);
-            StrList->_size--;
+    int place = 0;
+    while(current){
+        if(strcmp(current->_data,data)==0){
+            current = current->_next;
+            StrList_removeAt(StrList,place);
+        }else{
+            current = current->_next;
+            place++;
         }
-        current = current->_next;
-        next = current->_next;
-    }
-    Node*head = StrList->_head;
-    if(strcmp(head->_data,data)==0){
-        StrList->_head = head->_next;
-        Node_free(head);
-        StrList->_size--;
     }
 }
 
@@ -187,6 +198,7 @@ void StrList_removeAt(StrList*StrList, int index){
         StrList->_head = current->_next;
         Node_free(current);
         StrList->_size--;
+        return;
     }
     Node*next = current->_next;
     int count = 0;
